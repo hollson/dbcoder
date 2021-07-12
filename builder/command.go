@@ -13,9 +13,7 @@ import (
 	"github.com/hollson/dbcoder/utils"
 )
 
-// 版本信息
-const AppName = "dbcoder"
-const VERSION = "v1.0.0"
+
 
 var (
 	_driver  string
