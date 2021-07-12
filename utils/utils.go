@@ -7,10 +7,10 @@ import (
 
 const BLANK = ""
 
-// 数组中是否包含该字符
-func In(s string, arr []string) bool {
-	for _, v := range arr {
-		if v == s {
+// 目标元素tar是否包含在container集合中
+func ContainString(tar string, container ...string) bool {
+	for _, v := range container {
+		if tar == v {
 			return true
 		}
 	}

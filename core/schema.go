@@ -10,7 +10,20 @@ package core
 // 数据库信息
 type Schema interface {
 	Tables() ([]Table, error)
+	TypeMapping(string) Type
 	// 类型映射
+}
+
+type SchemaType string
+
+// type SchemaType interface {
+// 	TypeMapping(string) Type
+// }
+
+// Go结构体字段类型
+type Type struct {
+	Name string // 类型名称，如：int，string，time.Time，decimal.Decimal等
+	Pack string // 引用的包，如：time，github.com/shopspring/decimal等
 }
 
 // 数据库表
@@ -18,9 +31,7 @@ type Table struct {
 	Name        string   // 表名
 	Columns     []Column // 字段
 	Comment     string   // 注释
-	// 特殊类型的依赖包
-	//  如pg.Int64Array类型,须引用"github.com/lib/pg"
-	SpecialPack []string
+	SpecialPack []string // 特殊类型的依赖包，如pg.Int64Array类型,须引用"github.com/lib/pg"
 }
 
 // 数据库表字段

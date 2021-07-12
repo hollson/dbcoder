@@ -10,14 +10,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/hollson/dbcoder/builder/findSql"
 	"github.com/hollson/dbcoder/core"
 	"github.com/hollson/dbcoder/dialect/pgsql"
 	"github.com/hollson/dbcoder/utils"
 )
-
-var Tables []string
-var Columns []*findSql.Column
 
 // 生成器工厂
 func schemaFactory(driver core.DatabaseDriver, cfg *core.Config) core.Schema {
@@ -61,7 +57,7 @@ func Generate(driver core.DatabaseDriver, cfg *core.Config) error {
 		if err != nil {
 			return err
 		}
-		data := Schema2Template(driver, cfg, tables...)
+		data := Schema2Template(driver, cfg, schema, tables...)
 		if err := Execute(f, data); err != nil {
 			return err
 		}
@@ -77,7 +73,7 @@ func Generate(driver core.DatabaseDriver, cfg *core.Config) error {
 			return err
 		}
 
-		data := Schema2Template(driver, cfg, table)
+		data := Schema2Template(driver, cfg, schema, table)
 		if err := Execute(f, data); err != nil {
 			return err
 		}
@@ -86,7 +82,7 @@ func Generate(driver core.DatabaseDriver, cfg *core.Config) error {
 	return nil
 }
 
-func Schema2Template(driver core.DatabaseDriver, cfg *core.Config, tables ...core.Table) *GenTemplate {
+func Schema2Template(driver core.DatabaseDriver, cfg *core.Config, schema core.Schema, tables ...core.Table) *GenTemplate {
 	t := &GenTemplate{
 		Generator: cfg.AppName,
 		Version:   cfg.Version,
@@ -106,13 +102,33 @@ func Schema2Template(driver core.DatabaseDriver, cfg *core.Config, tables ...cor
 		for _, column := range table.Columns {
 			obj.Fields = append(obj.Fields, Field{
 				Name:    utils.Pascal(column.Name),
-				Type:    column.Type, // fixme 转换
+				Type:    schema.TypeMapping(column.Type).Name, // fixme 转换
 				Tag:     column.Default,
 				Comment: column.Comment,
 			})
+			if pack:= schema.TypeMapping(column.Type).Pack; len(pack)>0{
+				t.Imports=append(t.Imports, pack)
+			}
 		}
-		t.Imports = table.SpecialPack
+		t.Imports = distinctStringArray(t.Imports)
 		t.Structs = append(t.Structs, obj)
 	}
 	return t
+}
+
+func distinctStringArray(arr []string) (newArr []string) {
+	newArr = make([]string, 0)
+	for i := 0; i < len(arr); i++ {
+		repeat := false
+		for j := i + 1; j < len(arr); j++ {
+			if arr[i] == arr[j] {
+				repeat = true
+				break
+			}
+		}
+		if !repeat {
+			newArr = append(newArr, arr[i])
+		}
+	}
+	return newArr
 }

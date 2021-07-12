@@ -7,9 +7,13 @@ package pgsql
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/hollson/dbcoder/core"
+	"github.com/hollson/dbcoder/utils"
 )
+
+const Empty = ""
 
 type Database struct {
 	Host   string
@@ -37,10 +41,6 @@ func New(c *core.Config) *Database {
 		gen.Auth = "postgres"
 	}
 	return gen
-}
-
-func (g *Database) Close() error {
-	return nil
 }
 
 // 连接字符串
@@ -142,11 +142,29 @@ func (g *Database) columns(tableName string, db *sql.DB) (ret []core.Column, err
 }
 
 // 类型映射
-func TypeMapping() {
-
-}
-
-func (g *Database) Gen() error {
-
-	panic("implement me")
+func (g *Database) TypeMapping(_type string) core.Type {
+	switch {
+	case utils.ContainString(_type, "bigserial", "serial", "big serial", "int"):
+		return core.Type{Name: "int", Pack: Empty}
+	case _type == "smallint":
+		return core.Type{Name: "int16", Pack: Empty}
+	case _type == "integer":
+		return core.Type{Name: "int32", Pack: Empty}
+	case _type == "bigint":
+		return core.Type{Name: "int64", Pack: Empty}
+	case utils.ContainString(_type, "numeric", "decimal", "real"):
+		return core.Type{Name: "decimal.Decimal", Pack: "github.com/shopspring/decimal"}
+	case strings.Contains(_type, "time") || _type == "date":
+		return core.Type{Name: "time.Time", Pack: "time"}
+	case _type == "bytea":
+		return core.Type{Name: "[]byte", Pack: Empty}
+	case strings.Contains(_type, "char") || utils.ContainString(_type, "text", "longtext"):
+		return core.Type{Name: "string", Pack: Empty}
+	case strings.Contains(_type, "char") || strings.Contains(_type, "text"):
+		return core.Type{Name: "pq.StringArray", Pack: "pq.StringArray"}
+	case strings.Contains(_type, "integer"):
+		return core.Type{Name: "pq.Int64Array", Pack: "pq.StringArray"}
+	default:
+		return core.Type{Name: "interface{}", Pack: Empty}
+	}
 }

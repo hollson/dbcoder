@@ -13,8 +13,6 @@ import (
 	"github.com/hollson/dbcoder/utils"
 )
 
-
-
 var (
 	_driver  string
 	_host    string
@@ -113,7 +111,7 @@ func check() error {
 // 打印帮助信息
 func Usage() {
 	fmt.Println("\033[1;34m Welcome to dbcoder\033[0m")
-	fmt.Printf("\u001B[1;35m       ____                   __         \n  ____/ / /_  _________  ____/ ___  _____\n / __  / __ \\/ ___/ __ \\/ __  / _ \\/ ___/\n/ /_/ / /_/ / /__/ /_/ / /_/ /  __/ /    \n\\__,_/_.___/\\___/\\____/\\__,_/\\___/_/     (%v)\u001B[0m\n",VERSION)
+	fmt.Printf("\u001B[1;35m       ____                   __         \n  ____/ / /_  _________  ____/ ___  _____\n / __  / __ \\/ ___/ __ \\/ __  / _ \\/ ___/\n/ /_/ / /_/ / /__/ /_/ / /_/ /  __/ /    \n\\__,_/_.___/\\___/\\____/\\__,_/\\___/_/     (%v)\u001B[0m\n", VERSION)
 	fmt.Printf(`
 Usage:
     dbcoder <command> dbname=<dbName> [option]...
