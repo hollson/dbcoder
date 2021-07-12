@@ -6,6 +6,7 @@ build:clean
 	@go build -o ./bin/
 	@echo "\033[31m ☕️ 编译完成\033[0m";
 
+
 ## clean@清理编译、日志和缓存等数据。
 .PHONY:clean
 clean:

@@ -14,7 +14,7 @@ import (
 )
 
 // 版本信息
-const AppName = "db2go"
+const AppName = "dbcoder"
 const VERSION = "v1.0.0"
 
 var (
@@ -114,11 +114,11 @@ func check() error {
 
 // 打印帮助信息
 func Usage() {
-	fmt.Println("\033[1;34m Welcome to db2go\033[0m")
-	fmt.Printf("\033[1;34m  ______  ______     ______  _____ \n  |     \\ |_____]   |  ____ |     |\n  |_____/ |_____] 2 |______||_____| (%v)\033[0m\n", VERSION)
+	fmt.Println("\033[1;34m Welcome to dbcoder\033[0m")
+	fmt.Printf("\u001B[1;35m       ____                   __         \n  ____/ / /_  _________  ____/ ___  _____\n / __  / __ \\/ ___/ __ \\/ __  / _ \\/ ___/\n/ /_/ / /_/ / /__/ /_/ / /_/ /  __/ /    \n\\__,_/_.___/\\___/\\____/\\__,_/\\___/_/     (%v)\u001B[0m\n",VERSION)
 	fmt.Printf(`
 Usage:
-    db2go <command> dbname=<dbName> [option]...
+    dbcoder <command> dbname=<dbName> [option]...
 
 Command:
     mysql	从mysql数据库生成表实体
@@ -138,10 +138,10 @@ Default param:
     pgsql: -host=localhost -port=5432 -user=postgres -auth=postgres
 
 Example:
-    db2go -driver=pgsql -dbname=testdb
-    db2go -driver=pgsql -host=localhost -port=5432 -user=postgres -auth=postgres -dbname=testdb -gorm -package=entity
+    dbcoder -driver=pgsql -dbname=testdb
+    dbcoder -driver=pgsql -host=localhost -port=5432 -user=postgres -auth=postgres -dbname=testdb -gorm -package=entity
 
-更多详情，请参考 https://github.com/hollson/db2go
+更多详情，请参考 https://github.com/hollson/dbcoder
 
 `)
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-// 数据库代码生成器配置项
+// 代码生成器配置项
 type Config struct {
 	AppName string // 应用名称
 	Version string // 应用版本
