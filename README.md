@@ -15,7 +15,7 @@ $ go build
 `windows`
 
 ```shell
-$ dbcoder.exe -host=127.0.0.1 -port=5432 -user=postgres -pwd=postgres  -dbname=db_test -gorm=true -driver=pgsql
+$ dbcoder.exe -host=127.0.0.1 -port=5432 -user=postgres -pwd=postgres  -dbname=db_test -gorm=true -driver=pgsql.sql
 ```
 
 `linux`
@@ -39,7 +39,7 @@ Usage of dbcoder.exe:
   -dbname string
         必填，数据库名称，否则会报错
   -driver string
-        必填，需要连接的数据库，现在只支持mysql、pgsql 例如 -driver=mysql，-driver=pgsql
+        必填，需要连接的数据库，现在只支持mysql、pgsql.sql 例如 -driver=mysql，-driver=pgsql.sql
   -gorm
         选填，是否添加 gorm tag，true添加，false不添加，默认不添加
   -host string

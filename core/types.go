@@ -4,6 +4,22 @@
 
 package core
 
+// 由0和1构成是字符串
+type BIT string
+
+func (b BIT) String() string {
+	// strings.
+	// for _, c := range b {
+	// 	if c == '1' {
+	//
+	// 	}
+	// }
+	// if strings.Contains(b, "") {
+	//
+	// }
+	return "00000000"
+}
+
 // type Type string
 //
 // const (
@@ -24,7 +40,6 @@ package core
 // 	String      Type = "string"
 // 	Interface   Type = "interface{}"
 // )
-
 
 //
 // //类型转换，没有的类型在这里面添加

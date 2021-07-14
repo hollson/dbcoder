@@ -141,30 +141,84 @@ func (g *Database) columns(tableName string, db *sql.DB) (ret []core.Column, err
 	return
 }
 
-// 类型映射
+// Postgresql类型映射的Golang数据类型
+// https://www.runoob.com/postgresql/postgresql-data-type.html
+// https://www.runoob.com/manual/PostgreSQL/datatype.html
 func (g *Database) TypeMapping(_type string) core.Type {
+	if strings.Contains(_type, "[]") {
+
+	}
+
 	switch {
-	case utils.ContainString(_type, "bigserial", "serial", "big serial", "int"):
-		return core.Type{Name: "int", Pack: Empty}
-	case _type == "smallint":
+	case utils.HasAny(_type, "boolean"):
+		return core.Type{Name: "bool", Pack: Empty}
+	case utils.HasAny(_type, "bytea"):
+		return core.Type{Name: "byte", Pack: Empty}
+	case utils.HasAny(_type, "smallint"):
 		return core.Type{Name: "int16", Pack: Empty}
-	case _type == "integer":
-		return core.Type{Name: "int32", Pack: Empty}
-	case _type == "bigint":
+	case utils.HasAny(_type, "smallint"):
+		return core.Type{Name: "int16", Pack: Empty}
+	case utils.HasAny(_type, "real"):
+		return core.Type{Name: "uint32", Pack: Empty}
+	case utils.HasAny(_type, "integer"):
+		return core.Type{Name: "int", Pack: Empty}
+	case utils.HasAny(_type, "bigint"):
 		return core.Type{Name: "int64", Pack: Empty}
-	case utils.ContainString(_type, "numeric", "decimal", "real"):
+	case utils.HasAny(_type, "double"):
+		return core.Type{Name: "int64", Pack: Empty}
+
+	case utils.HasAny(_type, "numeric"):
+		return core.Type{Name: "float64", Pack: Empty}
+	case utils.HasAny(_type, "decimal"):
 		return core.Type{Name: "decimal.Decimal", Pack: "github.com/shopspring/decimal"}
-	case strings.Contains(_type, "time") || _type == "date":
-		return core.Type{Name: "time.Time", Pack: "time"}
-	case _type == "bytea":
-		return core.Type{Name: "[]byte", Pack: Empty}
-	case strings.Contains(_type, "char") || utils.ContainString(_type, "text", "longtext"):
+
+	case utils.HasAny(_type, "char", "text"):
 		return core.Type{Name: "string", Pack: Empty}
-	case strings.Contains(_type, "char") || strings.Contains(_type, "text"):
-		return core.Type{Name: "pq.StringArray", Pack: "pq.StringArray"}
-	case strings.Contains(_type, "integer"):
-		return core.Type{Name: "pq.Int64Array", Pack: "pq.StringArray"}
+
+	case utils.HasAny(_type, "time", "date"):
+		return core.Type{Name: "time.Time", Pack: "time"}
 	default:
 		return core.Type{Name: "interface{}", Pack: Empty}
 	}
 }
+
+//
+// bitN  二进制
+// bytea
+//
+// boolean
+//
+// interval
+// uuid
+// character varying
+// character
+// text
+// cidr
+// inet
+// macaddr
+//
+//
+// timestamp with time zone
+// timestamp without time zone
+// timestamp without time zone
+//
+// // time.Time
+// date
+// time with time zone
+// time without time zone
+//
+// =====  decimal
+// numeric
+// money
+//
+// double precision
+// real
+//
+//===== int16
+// smallint
+// // int32
+// integer
+// //uint64
+// bigint
+
+

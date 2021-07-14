@@ -33,6 +33,49 @@ func RangeStringsFunc(arr []string, f func(string) string) {
 	}
 }
 
+// 字符串切片去重
+func DistinctStringArray(arr []string) (newArr []string) {
+	newArr = make([]string, 0)
+	for i := 0; i < len(arr); i++ {
+		repeat := false
+		for j := i + 1; j < len(arr); j++ {
+			if arr[i] == arr[j] {
+				repeat = true
+				break
+			}
+		}
+		if !repeat {
+			newArr = append(newArr, arr[i])
+		}
+	}
+	return newArr
+}
+
+// 修剪路径中的切割符
 func PathTrim(path string) string {
 	return strings.ReplaceAll(path, "//", "/")
+}
+
+// raw中是否包含sub...中的任意子串
+//  如: HasSub("datetime","date") => true
+//     HasSub("datetime","time") => true
+func HasAny(raw string, sub ...string) bool {
+	for _, v := range sub {
+		if strings.Contains(raw, v) {
+			return true
+		}
+	}
+	return false
+}
+
+// raw中是否包含sub...中的所有子串
+//  如: HasSub("datetime","date","time") => true
+//     HasSub("datetime","time") => false
+func HasAll(raw string, sub ...string) bool {
+	for _, v := range sub {
+		if !strings.Contains(raw, v) {
+			return false
+		}
+	}
+	return true
 }

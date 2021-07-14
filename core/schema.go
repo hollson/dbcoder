@@ -22,8 +22,12 @@ type SchemaType string
 
 // Go结构体字段类型
 type Type struct {
-	Name string // 类型名称，如：int，string，time.Time，decimal.Decimal等
-	Pack string // 引用的包，如：time，github.com/shopspring/decimal等
+	// 类型名称
+	//  如：int，string，time.Time，decimal.Decimal等
+	Name string
+	// 引用的包
+	//  如：time，github.com/shopspring/decimal等
+	Pack string
 }
 
 // 数据库表

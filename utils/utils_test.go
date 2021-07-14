@@ -30,3 +30,13 @@ func TestPascal(t *testing.T) {
 	fmt.Println(Pascal("_user_name_"))
 	fmt.Println(Pascal("_user_name_99"))
 }
+
+func TestHasSub(t *testing.T) {
+	fmt.Println(HasAny("datetime", "date", "time")) // true
+	fmt.Println(HasAny("datetime", "date"))         // true
+	fmt.Println(HasAny("datetime", "time", "abc"))  // true
+	fmt.Println(HasAny("datetime", "time", "xyz"))  // true
+	fmt.Println(HasAny("datetime", "xyz"))          // false
+	fmt.Println(HasAny("datetime", "xxx", "yyy"))   // false
+	fmt.Println(HasAny("time", "timestamp"))        // false
+}
