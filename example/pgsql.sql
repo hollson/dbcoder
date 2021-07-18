@@ -26,22 +26,22 @@ CREATE TABLE public.test_table
     t_double              double precision            DEFAULT 64.00,        --双精度
     t_float               float                       DEFAULT 1.01,
     t_float8              float8                      DEFAULT 2.02,
-    t_numeric             numeric(18, 2)              DEFAULT 3.03,
-    t_decimal             decimal(18, 2)              DEFAULT 4.04,
-    t_money               money                       DEFAULT 9.99,
     t_timestamp           timestamp                   DEFAULT CURRENT_TIMESTAMP::date,
     t_timestamp_z         timestamp WITH time zone    DEFAULT CURRENT_TIMESTAMP,
     t_timestamp_nz        timestamp WITHOUT time zone DEFAULT CURRENT_TIMESTAMP,
-    t_timeZ               time WITH time zone         DEFAULT CURRENT_TIMESTAMP,
-    t_timeNZ              time WITHOUT time zone      DEFAULT now(),
-    t_date                date                        DEFAULT CURRENT_DATE, -- ,CURRENT_TIMESTAMP::date
     t_inet                inet                        DEFAULT '192.168.10.1/24',
     t_cidr                cidr                        DEFAULT '192.168.10/24',
     t_macaddr             macaddr                     DEFAULT '08:00:2b:01:02:03',
     t_interval            interval                    DEFAULT '1 min',      --1s
+    t_bytea               bytea                       DEFAULT '\134',       -- '\134',E'\\xFC'
+    t_timeZ               time WITH time zone         DEFAULT CURRENT_TIMESTAMP,
+    t_timeNZ              time WITHOUT time zone      DEFAULT now(),
+    t_date                date                        DEFAULT CURRENT_DATE, -- ,CURRENT_TIMESTAMP::date
+    t_decimal             decimal(18, 2)              DEFAULT 18.02,
+    t_numeric             numeric(18, 2)              DEFAULT 18.02,
+    t_money               money                       DEFAULT 99.99,
     t_bit                 bit                         DEFAULT '1',          --bit(1)
-    t_bit_n               bit(3)                      DEFAULT '101',        --bit(N)
-    t_bytea               bytea                       DEFAULT '\134'        -- '\134',E'\\xFC'
+    t_bit_n               bit(3)                      DEFAULT '101'         --bit(N)
 );
 
 -- 添加注释
@@ -73,32 +73,32 @@ COMMENT ON INDEX public.idx_test IS '一个索引测试';
 DROP TABLE IF EXISTS public.test_array;
 CREATE TABLE public.test_array
 (
-    id                    serial NOT NULL PRIMARY KEY,
-    t_bytea               bytea[],
-    arr_boolean           boolean[]                     DEFAULT ARRAY [true, false],
-    arr_smallint          smallint[]                    DEFAULT ARRAY [1, 1],
-    arr_integer           integer[]                     DEFAULT ARRAY [11, 22],
-    arr_bigint            bigint[]                      DEFAULT ARRAY [111, 222],
-    arr_real              real[]                        DEFAULT ARRAY [111, 222],
-    arr_int2d             int[][]                       DEFAULT ARRAY [[1,2,3],[4,5,6]],
-    arr_varcharN          varchar(20)[]                 DEFAULT ARRAY ['a', 'a'],
-    arr_characterVaryingN character varying(20)[]       DEFAULT ARRAY ['b', 'b'],
-    arr_charN             char(20)[]                    DEFAULT ARRAY ['c', 'c'],
-    arr_characterN        character(20)[]               DEFAULT ARRAY ['d', 'd'],
-    arr_text              text[]                        DEFAULT ARRAY ['e', 'e'],
-    arr_timestampZ        timestamp WITH time zone[]    DEFAULT ARRAY [CURRENT_TIMESTAMP],
-    arr_timestampNZ       timestamp WITHOUT time zone[] DEFAULT ARRAY [CURRENT_TIMESTAMP],
-    arr_numeric           numeric(18, 2)[]              DEFAULT ARRAY [1.1, 1.2],
-    arr_decimal           decimal(18, 2)[]              DEFAULT ARRAY [2.1, 2.2],
-    arr_money             money[]                       DEFAULT ARRAY [10.01, 10.02],
-    arr_timeZ             time WITH time zone[]         DEFAULT ARRAY [CURRENT_TIMESTAMP],
-    arr_timeNZ            time WITHOUT time zone[]      DEFAULT ARRAY [CURRENT_TIMESTAMP],
-    arr_date              date[]                        DEFAULT ARRAY [CURRENT_DATE,now()],
-    arr_bit               bit[]                         DEFAULT ARRAY ['1'::bit,'0'::bit],
-    arr_bit_n             bit(3)[]                      DEFAULT ARRAY ['1'::bit(3),'0'::bit(3)]
+    id                      serial NOT NULL PRIMARY KEY,
+    arr_boolean             boolean[]                     DEFAULT ARRAY [true, false],
+    arr_bytea               bytea[],
+    arr_smallint            smallint[]                    DEFAULT ARRAY [1, 1],
+    arr_integer             integer[]                     DEFAULT ARRAY [11, 22],
+    arr_bigint              bigint[]                      DEFAULT ARRAY [111, 222],
+    arr_real                real[]                        DEFAULT ARRAY [111, 222],
+    arr_int2d               int[][]                       DEFAULT ARRAY [[1,2,3],[4,5,6]],
+    arr_varchar_n           varchar(20)[]                 DEFAULT ARRAY ['a', 'a'],
+    arr_character_varying_n character varying(20)[]       DEFAULT ARRAY ['b', 'b'],
+    arr_char_n              char(20)[]                    DEFAULT ARRAY ['c', 'c'],
+    arr_character_n         character(20)[]               DEFAULT ARRAY ['d', 'd'],
+    arr_text                text[]                        DEFAULT ARRAY ['e', 'e'],
+    arr_timestamp_z         timestamp WITH time zone[]    DEFAULT ARRAY [CURRENT_TIMESTAMP],
+    arr_timestamp_nz        timestamp WITHOUT time zone[] DEFAULT ARRAY [CURRENT_TIMESTAMP],
+    arr_bit                 bit[]                         DEFAULT ARRAY ['1'::bit,'0'::bit],
+    arr_bit_n               bit(3)[]                      DEFAULT ARRAY ['1'::bit(3),'0'::bit(3)],
+    arr_numeric             numeric(18, 2)[]              DEFAULT ARRAY [1.1, 1.2],
+    arr_decimal             decimal(18, 2)[]              DEFAULT ARRAY [2.1, 2.2],
+    arr_money               money[]                       DEFAULT ARRAY [10.01, 10.02],
+    arr_time_z              time WITH time zone[]         DEFAULT ARRAY [CURRENT_TIMESTAMP],
+    arr_time_nz             time WITHOUT time zone[]      DEFAULT ARRAY [CURRENT_TIMESTAMP],
+    arr_date                date[]                        DEFAULT ARRAY [CURRENT_DATE,now()]
 );
 COMMENT ON TABLE public.test_array IS '演示数组类型';
-COMMENT ON COLUMN public.test_array.t_bytea IS '二维字节数组,即[][]byte';
+COMMENT ON COLUMN public.test_array.arr_bytea IS '二维数组，即[][]byte';
 
 INSERT INTO public.test_array(id)
 VALUES (1);
