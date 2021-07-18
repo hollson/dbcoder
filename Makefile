@@ -19,6 +19,7 @@ clean:
 	@rm -rf ./dbcoder;
 	@rm -rf ./bin;
 	@rm -rf ./_gen;
+	@rm -rf ./model
 	@echo "\033[31m ✅  清理完毕\033[0m";
 
 
@@ -42,7 +43,7 @@ push:commit
 ## test@执行测试。
 .PHONY:test
 test: build
-	@./bin/dbcoder -driver=pgsql -host=localhost -port=5432 -user=postgres -auth=123456 -dbname=deeplink -gorm=true -package=hello
+	@./bin/dbcoder -driver=pgsql -host=localhost -port=5432 -user=postgres -auth=123456 -dbname=deeplink -gorm=true
 
 
 ## help@查看make帮助。

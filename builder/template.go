@@ -26,11 +26,8 @@ package {{.Package}} {{ifImports .Imports}}
 {{range .Structs}}{{ifComment .Comment}}
 type {{.Name}} struct {
 	{{range .Fields}}{{.Name}} {{.Type}}  $BACKQUOTE{{.Tag}}$BACKQUOTE {{if ne .Comment ""}} //{{.Comment}}{{end}}
-	{{ end }}
-}
-{{end}}`
+{{end}}}{{end}}`
 
-//$BACKQUOTE
 type GenTemplate struct {
 	Generator string   // 生成器名称
 	Version   string   // 生成器版本
@@ -86,10 +83,10 @@ func IfComment(comment string) string {
 
 // 模板生成输出内容
 func Execute(w io.Writer, tpl *GenTemplate) error {
-	t := template.New("text")                             // 定义模板对象
-	t = t.Funcs(template.FuncMap{"ifImports": IfImports}) // 控制自定义元素
-	t = t.Funcs(template.FuncMap{"ifComment": IfComment}) // 控制自定义元素
-	t, err := t.Parse(strings.Replace(_template, "$BACKQUOTE", "`", -1))                          //
+	t := template.New("text")                                            // 定义模板对象
+	t = t.Funcs(template.FuncMap{"ifImports": IfImports})                // 控制自定义元素
+	t = t.Funcs(template.FuncMap{"ifComment": IfComment})                // 控制自定义元素
+	t, err := t.Parse(strings.Replace(_template, "$BACKQUOTE", "`", -1)) // 处理反引号
 	if err != nil {
 		return err
 	}

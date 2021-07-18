@@ -7,50 +7,35 @@ package pgsql
 import (
 	"database/sql"
 	"fmt"
-	"strings"
 
-	"github.com/hollson/dbcoder/core"
+	"github.com/hollson/dbcoder/internal"
 	"github.com/hollson/dbcoder/utils"
+	_ "github.com/lib/pq"
 )
 
 const Empty = ""
 
-type Database struct {
-	Host   string
-	Port   int
-	User   string
-	Auth   string
-	DbName string
+// PostgreSQL数据库代码生成器
+type Generator struct {
+	Source string // 连接字符串
 }
 
-func New(c *core.Config) *Database {
-	gen := &Database{
-		Host:   c.Host,
-		Port:   c.Port,
-		User:   c.User,
-		Auth:   c.Auth,
-		DbName: c.DbName,
+func New(host string, port int, user, auth, dbname string) *Generator {
+	if port == 0 {
+		port = 5432
 	}
-	if gen.Port == 0 {
-		gen.Port = 5432
+	if len(user) == 0 {
+		user = "postgres"
 	}
-	if len(gen.User) == 0 {
-		gen.User = "postgres"
+	if len(auth) == 0 {
+		auth = "postgres"
 	}
-	if len(gen.Auth) == 0 {
-		gen.Auth = "postgres"
-	}
-	return gen
-}
-
-// 连接字符串
-func (g *Database) source() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		g.User, g.Auth, g.Host, g.Port, g.DbName)
+	source := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", user, auth, host, port, dbname)
+	return &Generator{source}
 }
 
 // 查询数据库表清单SQL
-func (g *Database) tablesSQL() string {
+func (g *Generator) tablesSQL() string {
 	return `SELECT a.tablename,
 			COALESCE(c.description,'') AS comment
 			FROM pg_tables a
@@ -60,41 +45,36 @@ func (g *Database) tablesSQL() string {
 }
 
 // 查询数据表定义SQL
-func (g *Database) columnsSQL(tableName string) string {
+func (g *Generator) columnsSQL(tableName string) string {
 	return fmt.Sprintf(`
-SELECT  a.attname AS field_name,	--字段表名
-		a.attnotnull AS not_null,	--是否为NULL
-		a.attlen AS field_size,		-- 字段大小
-		COALESCE (ct.contype = 'p', FALSE ) AS is_primary_key,				-- 是否主键
-		COALESCE (pg_get_expr(ad.adbin, ad.adrelid),'') AS default_value,	-- 默认值
-		COALESCE(b.description,'') AS comment,								--注释
-		CASE WHEN a.atttypid = ANY ('{int,int8,int2}'::regtype[]) AND EXISTS (SELECT 1 FROM pg_attrdef ad WHERE ad.adrelid = a.attrelid AND ad.adnum = a.attnum )
-			THEN CASE a.atttypid
-				WHEN 'int'::regtype THEN 'serial'
-				WHEN 'int8'::regtype THEN 'bigserial'
-				WHEN 'int2'::regtype THEN 'smallserial' END
-			WHEN a.atttypid = ANY ('{uuid}'::regtype[]) AND COALESCE (pg_get_expr(ad.adbin, ad.adrelid ),'')<>''
-				THEN 'autogenuuid' ELSE format_type( a.atttypid, a.atttypmod )
-		END AS field_type										-- 标识类型 
+SELECT a.attname                                       AS field_name,       
+       a.attlen                                        AS field_size,
+       a.atttypid::regtype                             AS field_type,
+       COALESCE(ct.contype = 'p', FALSE)               AS is_primary_key,   
+       a.attnotnull                                    AS not_null,         
+       COALESCE(pg_get_expr(ad.adbin, ad.adrelid), '') AS default_value,    
+       COALESCE(b.description, '')                     AS comment           
 FROM pg_attribute a
-	INNER JOIN ONLY pg_class C ON C.oid = a.attrelid
-	INNER JOIN ONLY pg_namespace n ON n.oid = C.relnamespace
-	LEFT JOIN pg_constraint ct ON ct.conrelid = C.oid AND a.attnum = ANY ( ct.conkey ) AND ct.contype = 'p'
-	LEFT JOIN pg_attrdef ad ON ad.adrelid = C.oid AND ad.adnum = a.attnum
-	LEFT JOIN pg_description b ON a.attrelid=b.objoid AND a.attnum = b.objsubid
-	LEFT join pg_type t ON a.atttypid = t.oid
-WHERE a.attisdropped = FALSE AND a.attnum > 0 AND n.nspname = 'public' AND C.relname ='%s' -- 表名
-ORDER BY a.attnum
+         INNER JOIN ONLY pg_class C ON C.oid = a.attrelid
+         INNER JOIN ONLY pg_namespace n ON n.oid = C.relnamespace
+         LEFT JOIN pg_constraint ct ON ct.conrelid = C.oid AND a.attnum = ANY (ct.conkey) AND ct.contype = 'p'
+         LEFT JOIN pg_attrdef ad ON ad.adrelid = C.oid AND ad.adnum = a.attnum
+         LEFT JOIN pg_description b ON a.attrelid = b.objoid AND a.attnum = b.objsubid
+         left join pg_type t on a.atttypid = t.oid
+WHERE a.attisdropped = FALSE
+  AND a.attnum > 0
+  AND n.nspname = 'public'
+  AND C.relname = '%s'
+ORDER BY a.attnum;
 `, tableName)
 }
 
-//
-func (g *Database) Tables() (ret []core.Table, err error) {
-	_db, err := sql.Open("postgres", g.source())
+func (g *Generator) Tables() (ret []internal.Table, err error) {
+	_db, err := sql.Open("postgres", g.Source)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf(" 💻 连接数据库: %s\n", g.source())
+	fmt.Printf(" 💻 连接数据库: %s\n", g.Source)
 	defer _db.Close()
 
 	rows, err := _db.Query(g.tablesSQL())
@@ -104,7 +84,7 @@ func (g *Database) Tables() (ret []core.Table, err error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var t = core.Table{}
+		var t = internal.Table{}
 		if err := rows.Scan(&t.Name, &t.Comment); err != nil {
 			return nil, err
 		}
@@ -118,22 +98,22 @@ func (g *Database) Tables() (ret []core.Table, err error) {
 	return
 }
 
-func (g *Database) columns(tableName string, db *sql.DB) (ret []core.Column, err error) {
+func (g *Generator) columns(tableName string, db *sql.DB) (ret []internal.Column, err error) {
 	rows, err := db.Query(g.columnsSQL(tableName))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var t = core.Column{}
+	var t = internal.Column{}
 	for rows.Next() {
 		if err := rows.Scan(
 			&t.Name,
-			&t.NotNull,
 			&t.Size,
+			&t.Type,
 			&t.Primary,
+			&t.NotNull,
 			&t.Default,
-			&t.Comment,
-			&t.Type); err != nil {
+			&t.Comment); err != nil {
 			return nil, err
 		}
 		ret = append(ret, t)
@@ -144,41 +124,69 @@ func (g *Database) columns(tableName string, db *sql.DB) (ret []core.Column, err
 // Postgresql类型映射的Golang数据类型
 // https://www.runoob.com/postgresql/postgresql-data-type.html
 // https://www.runoob.com/manual/PostgreSQL/datatype.html
-func (g *Database) TypeMapping(_type string) core.Type {
-	if strings.Contains(_type, "[]") {
-
+func (g *Generator) TypeMapping(_type string) internal.Type {
+	// 数组
+	if utils.HasAny(_type, "[]") {
+		switch {
+		// 布尔：
+		case utils.HasAny(_type, "boolean"):
+			return internal.Type{Name: "pq.BoolArray", Pack: "github.com/lib/pq"}
+			// 字节数组
+		case utils.HasAny(_type, "bytea"):
+			return internal.Type{Name: "pq.ByteaArray", Pack: "github.com/lib/pq"}
+			// 整数：
+		case utils.HasAny(_type, "smallint", "integer"):
+			return internal.Type{Name: "pq.Int32Array", Pack: "github.com/lib/pq"}
+		case utils.HasAny(_type, "bigint", "timestamp"):
+			return internal.Type{Name: "pq.Int64Array", Pack: "github.com/lib/pq"}
+			// 浮点数：
+		case utils.HasAny(_type, "real"):
+			return internal.Type{Name: "pq.Float32Array", Pack: "github.com/lib/pq"} // 单精度
+		case utils.HasAny(_type, "double"):
+			return internal.Type{Name: "pq.Float64Array", Pack: "github.com/lib/pq"} // 双精度
+		case utils.HasAny(_type, "numeric", "decimal", "money"):
+			return internal.Type{Name: "[]decimal.Decimal", Pack: "github.com/shopspring/decimal"}
+			// 字符串：
+		case utils.HasAny(_type, "uuid", "text", "character", "cidr", "inet", "macaddr", "interval"):
+			return internal.Type{Name: "pq.StringArray", Pack: "github.com/lib/pq"}
+			// 时间：
+		case utils.HasAny(_type, "time with", "date"):
+			return internal.Type{Name: "[]time.Time", Pack: "time"}
+		default:
+			return internal.Type{Name: "pq.GenericArray", Pack: "github.com/lib/pq"}
+		}
 	}
 
+	// 标量数据
 	switch {
+	// 布尔：
 	case utils.HasAny(_type, "boolean"):
-		return core.Type{Name: "bool", Pack: Empty}
+		return internal.Type{Name: "bool", Pack: Empty}
+		// 字节数组
 	case utils.HasAny(_type, "bytea"):
-		return core.Type{Name: "byte", Pack: Empty}
+		return internal.Type{Name: "[]byte", Pack: Empty}
+		// 整数：
 	case utils.HasAny(_type, "smallint"):
-		return core.Type{Name: "int16", Pack: Empty}
-	case utils.HasAny(_type, "smallint"):
-		return core.Type{Name: "int16", Pack: Empty}
-	case utils.HasAny(_type, "real"):
-		return core.Type{Name: "uint32", Pack: Empty}
+		return internal.Type{Name: "int16", Pack: Empty}
 	case utils.HasAny(_type, "integer"):
-		return core.Type{Name: "int", Pack: Empty}
-	case utils.HasAny(_type, "bigint"):
-		return core.Type{Name: "int64", Pack: Empty}
+		return internal.Type{Name: "int32", Pack: Empty}
+	case utils.HasAny(_type, "bigint", "timestamp"):
+		return internal.Type{Name: "int64", Pack: Empty}
+		// 浮点数：
+	case utils.HasAny(_type, "real"):
+		return internal.Type{Name: "float32", Pack: Empty} // 单精度
 	case utils.HasAny(_type, "double"):
-		return core.Type{Name: "int64", Pack: Empty}
-
-	case utils.HasAny(_type, "numeric"):
-		return core.Type{Name: "float64", Pack: Empty}
-	case utils.HasAny(_type, "decimal"):
-		return core.Type{Name: "decimal.Decimal", Pack: "github.com/shopspring/decimal"}
-
-	case utils.HasAny(_type, "char", "text"):
-		return core.Type{Name: "string", Pack: Empty}
-
-	case utils.HasAny(_type, "time", "date"):
-		return core.Type{Name: "time.Time", Pack: "time"}
+		return internal.Type{Name: "float64", Pack: Empty} // 双精度
+	case utils.HasAny(_type, "numeric", "decimal", "money"):
+		return internal.Type{Name: "decimal.Decimal", Pack: "github.com/shopspring/decimal"}
+		// 字符串：
+	case utils.HasAny(_type, "uuid", "text", "character", "cidr", "inet", "macaddr", "interval"):
+		return internal.Type{Name: "string", Pack: Empty}
+		// 时间：
+	case utils.HasAny(_type, "time with", "date"):
+		return internal.Type{Name: "time.Time", Pack: "time"}
 	default:
-		return core.Type{Name: "interface{}", Pack: Empty}
+		return internal.Type{Name: "interface{}", Pack: Empty}
 	}
 }
 
@@ -186,39 +194,10 @@ func (g *Database) TypeMapping(_type string) core.Type {
 // bitN  二进制
 // bytea
 //
-// boolean
+
 //
-// interval
-// uuid
-// character varying
-// character
-// text
-// cidr
-// inet
-// macaddr
-//
-//
-// timestamp with time zone
-// timestamp without time zone
-// timestamp without time zone
-//
-// // time.Time
-// date
-// time with time zone
-// time without time zone
-//
-// =====  decimal
-// numeric
-// money
-//
-// double precision
-// real
-//
-//===== int16
 // smallint
 // // int32
 // integer
 // //uint64
 // bigint
-
-

@@ -6,14 +6,16 @@ package pgsql
 
 import (
 	"fmt"
-	"strings"
+	"math/big"
 	"testing"
 )
 
 
-// has
 func TestContain(t *testing.T)  {
-	fmt.Println(strings.Count("date,time", "time"))
+	bigint := big.NewInt(123)
+	bigstr := bigint.String()
+	fmt.Println(bigstr)
 
+	// fmt.Println(strings.Count("date,time", "time"))
 	// fmt.Println(strings.IndexAny("hi,中国", "国"))
 }

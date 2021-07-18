@@ -2,10 +2,7 @@
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
 
-/*
-代码生成器所支持的数据库驱动项
-*/
-package core
+package internal
 
 // database driver type
 type DatabaseDriver int

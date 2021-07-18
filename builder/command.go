@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hollson/dbcoder/core"
+	"github.com/hollson/dbcoder/internal"
 	"github.com/hollson/dbcoder/dialect/gorm"
 	"github.com/hollson/dbcoder/utils"
 )
@@ -38,7 +38,7 @@ func initFlag() {
 	utils.StringVar(&_auth, "auth", "", "密码")
 	utils.StringVar(&_dbName, "dbname", "", "数据库名称")
 	utils.BoolVar(&gorm.Gorm, "gorm", false, "是否添加gorm标签")
-	utils.StringVar(&_out, "out", "./_gen", "输出路径")
+	utils.StringVar(&_out, "out", "./model", "输出路径")
 	utils.StringVar(&_package, "package", "model", "go文件包名")
 	utils.BoolVar(&_clean, "clean", false, "是否清理输出目录")
 	utils.BoolVar(&_version, "version", false, "查看版本")
@@ -47,7 +47,7 @@ func initFlag() {
 }
 
 // 加载命令行参数
-func Load() (core.DatabaseDriver, *core.Config) {
+func Load() (internal.DatabaseDriver, *internal.Config) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Printf("\033[%dmAn error occurred: %v\033[0m\n\n", utils.FgRed, err)
@@ -78,7 +78,7 @@ func Load() (core.DatabaseDriver, *core.Config) {
 		os.RemoveAll(_out)
 		os.Exit(0)
 	}
-	return core.DriverValue(_driver), &core.Config{
+	return internal.DriverValue(_driver), &internal.Config{
 		AppName: AppName,
 		Version: VERSION,
 		Host:    _host,
@@ -98,7 +98,7 @@ func check() error {
 		return fmt.Errorf("driver is needed")
 	}
 
-	if !core.Supported(_driver) {
+	if !internal.Supported(_driver) {
 		return fmt.Errorf("the driver named %v is not supported", _driver)
 	}
 

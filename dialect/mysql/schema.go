@@ -5,7 +5,7 @@
 package mysql
 
 import (
-	"github.com/hollson/dbcoder/core"
+	"github.com/hollson/dbcoder/internal"
 )
 
 type Generator struct {
@@ -16,7 +16,7 @@ type Generator struct {
 	DbName string
 }
 
-func New(config *core.Config) *Generator {
+func New(config *internal.Config) *Generator {
 	gen := &Generator{
 		Host:   "",
 		Port:   0,

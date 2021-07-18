@@ -6,6 +6,7 @@
 *.dylib
 bin
 _gen
+model
 
 # Test binary, built with `go test -c`
 *.test

@@ -5,7 +5,7 @@
 /*
  Schema定义了代码生成器所依赖的数据库信息
 */
-package core
+package internal
 
 // 数据库信息
 type Schema interface {
@@ -15,10 +15,6 @@ type Schema interface {
 }
 
 type SchemaType string
-
-// type SchemaType interface {
-// 	TypeMapping(string) Type
-// }
 
 // Go结构体字段类型
 type Type struct {

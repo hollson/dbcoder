@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
 
-package core
+package internal
 
 // 由0和1构成是字符串
 type BIT string

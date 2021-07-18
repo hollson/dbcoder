@@ -10,13 +10,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/hollson/dbcoder/core"
 	"github.com/hollson/dbcoder/dialect/pgsql"
+	"github.com/hollson/dbcoder/internal"
 	"github.com/hollson/dbcoder/utils"
 )
 
+// dbcoder -d pgsql -h localhost -p 5432 -u postgres -auth 123456 -d deeplink -gorm
+
 // 生成器工厂
-func schemaFactory(driver core.DatabaseDriver, cfg *core.Config) core.Schema {
+func schemaFactory(driver internal.DatabaseDriver, c *internal.Config) internal.Schema {
 	switch driver {
 	// case core.MySQL:
 	// 	return mysql.New(cfg)
@@ -31,12 +33,12 @@ func schemaFactory(driver core.DatabaseDriver, cfg *core.Config) core.Schema {
 	// case core.Oracle:
 	// 	return new(mysql.Generator)
 	default:
-		return pgsql.New(cfg)
+		return pgsql.New(c.Host, c.Port, c.User, c.Auth, c.DbName)
 	}
 }
 
 // 执行生成命令
-func Generate(driver core.DatabaseDriver, cfg *core.Config) error {
+func Generate(driver internal.DatabaseDriver, cfg *internal.Config) error {
 	schema := schemaFactory(driver, cfg)
 	tables, err := schema.Tables()
 	if err != nil {
@@ -82,7 +84,7 @@ func Generate(driver core.DatabaseDriver, cfg *core.Config) error {
 	return nil
 }
 
-func Schema2Template(driver core.DatabaseDriver, cfg *core.Config, schema core.Schema, tables ...core.Table) *GenTemplate {
+func Schema2Template(driver internal.DatabaseDriver, cfg *internal.Config, schema internal.Schema, tables ...internal.Table) *GenTemplate {
 	t := &GenTemplate{
 		Generator: cfg.AppName,
 		Version:   cfg.Version,
@@ -106,8 +108,8 @@ func Schema2Template(driver core.DatabaseDriver, cfg *core.Config, schema core.S
 				Tag:     column.Default,
 				Comment: column.Comment,
 			})
-			if pack:= schema.TypeMapping(column.Type).Pack; len(pack)>0{
-				t.Imports=append(t.Imports, pack)
+			if pack := schema.TypeMapping(column.Type).Pack; len(pack) > 0 {
+				t.Imports = append(t.Imports, pack)
 			}
 		}
 		t.Imports = utils.DistinctStringArray(t.Imports)
@@ -115,4 +117,3 @@ func Schema2Template(driver core.DatabaseDriver, cfg *core.Config, schema core.S
 	}
 	return t
 }
-
