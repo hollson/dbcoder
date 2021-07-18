@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hollson/dbcoder/internal"
 	"github.com/hollson/dbcoder/dialect/gorm"
+	"github.com/hollson/dbcoder/internal"
 	"github.com/hollson/dbcoder/utils"
 )
 
@@ -22,7 +22,6 @@ var (
 	_dbName  string
 	_package string
 	_out     string
-	_clean   bool
 	_version bool
 	_help    bool
 	_pile    bool
@@ -40,7 +39,6 @@ func initFlag() {
 	utils.BoolVar(&gorm.Gorm, "gorm", false, "是否添加gorm标签")
 	utils.StringVar(&_out, "out", "./model", "输出路径")
 	utils.StringVar(&_package, "package", "model", "go文件包名")
-	utils.BoolVar(&_clean, "clean", false, "是否清理输出目录")
 	utils.BoolVar(&_version, "version", false, "查看版本")
 	utils.BoolVar(&_pile, "pile", false, "单文件输出")
 	utils.BoolVar(&_help, "help", false, "查看帮助")
@@ -74,10 +72,7 @@ func Load() (internal.DatabaseDriver, *internal.Config) {
 	if err := check(); err != nil {
 		panic(err)
 	}
-	if _clean {
-		os.RemoveAll(_out)
-		os.Exit(0)
-	}
+
 	return internal.DriverValue(_driver), &internal.Config{
 		AppName: AppName,
 		Version: VERSION,
