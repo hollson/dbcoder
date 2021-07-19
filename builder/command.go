@@ -7,6 +7,7 @@ package builder
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/hollson/dbcoder/dialect/gorm"
 	"github.com/hollson/dbcoder/internal"
@@ -22,9 +23,11 @@ var (
 	_dbName  string
 	_package string
 	_out     string
+	_ignores string
 	_version bool
 	_help    bool
 	_pile    bool
+	_plump   bool
 )
 
 // 初始化Flag
@@ -39,9 +42,12 @@ func initFlag() {
 	utils.BoolVar(&gorm.Gorm, "gorm", false, "是否添加gorm标签")
 	utils.StringVar(&_out, "out", "./model", "输出路径")
 	utils.StringVar(&_package, "package", "model", "go文件包名")
+	utils.StringVar(&_ignores, "ignores", "", "忽略的表(用逗号分割,可使用通配符，如：t1,t2,t_*)")
+	utils.BoolVar(&_plump, "plump", false, "生成CURD代码")
 	utils.BoolVar(&_version, "version", false, "查看版本")
 	utils.BoolVar(&_pile, "pile", false, "单文件输出")
 	utils.BoolVar(&_help, "help", false, "查看帮助")
+
 }
 
 // 加载命令行参数
@@ -82,6 +88,7 @@ func Load() (internal.DatabaseDriver, *internal.Config) {
 		Auth:    _auth,
 		DbName:  _dbName,
 		Package: _package,
+		Ignores: strings.Split(_ignores, ","),
 		Out:     _out,
 		Pile:    _pile,
 	}

@@ -19,7 +19,7 @@ type Config struct {
 	DbName  string   // 数据库
 	Ignores []string // 忽略的数据表
 	Package string   // 包名
-	Sole    bool     // 仅生成实体
+	plump   bool     // 生成增删改查等数据操作代码
 	Out     string   // 输出路径
 	Pile    bool     // 单文件输出
 }

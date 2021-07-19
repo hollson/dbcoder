@@ -17,10 +17,11 @@ const Empty = ""
 
 // PostgreSQL数据库代码生成器
 type Generator struct {
-	Source string // 连接字符串
+	Source  string   // 连接字符串
+	ignores []string // 忽略的表
 }
 
-func New(host string, port int, user, auth, dbname string) *Generator {
+func New(host string, port int, user, auth, dbname string, ignores []string) *Generator {
 	if port == 0 {
 		port = 5432
 	}
@@ -31,7 +32,7 @@ func New(host string, port int, user, auth, dbname string) *Generator {
 		auth = "postgres"
 	}
 	source := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", user, auth, host, port, dbname)
-	return &Generator{source}
+	return &Generator{source, ignores}
 }
 
 // 查询数据库表清单SQL
@@ -88,6 +89,10 @@ func (g *Generator) Tables() (ret []internal.Table, err error) {
 		if err := rows.Scan(&t.Name, &t.Comment); err != nil {
 			return nil, err
 		}
+		if utils.MatchAny(t.Name, g.ignores...) {
+			continue
+		}
+
 		cs, err := g.columns(t.Name, _db)
 		if err != nil {
 			return nil, err
@@ -122,8 +127,8 @@ func (g *Generator) columns(tableName string, db *sql.DB) (ret []internal.Column
 }
 
 // Postgresql类型映射的Golang数据类型
-// https://www.runoob.com/postgresql/postgresql-data-type.html
-// https://www.runoob.com/manual/PostgreSQL/datatype.html
+//  参考：http://www.postgres.cn/docs/12/
+//       http://www.postgres.cn/docs/12/datatype.html
 func (g *Generator) TypeMapping(_type string) internal.Type {
 	// 数组
 	if utils.HasAny(_type, "[]") {
@@ -161,43 +166,31 @@ func (g *Generator) TypeMapping(_type string) internal.Type {
 	switch {
 	// 布尔：
 	case utils.HasAny(_type, "boolean"):
-		return internal.Type{Name: "bool", Pack: Empty}
+		return internal.Type{Name: "bool"}
 		// 字节数组
 	case utils.HasAny(_type, "bytea"):
-		return internal.Type{Name: "[]byte", Pack: Empty}
+		return internal.Type{Name: "[]byte"}
 		// 整数：
 	case utils.HasAny(_type, "smallint"):
-		return internal.Type{Name: "int16", Pack: Empty}
+		return internal.Type{Name: "int16"}
 	case utils.HasAny(_type, "integer"):
-		return internal.Type{Name: "int32", Pack: Empty}
+		return internal.Type{Name: "int32"}
 	case utils.HasAny(_type, "bigint", "timestamp"):
-		return internal.Type{Name: "int64", Pack: Empty}
+		return internal.Type{Name: "int64"}
 		// 浮点数：
 	case utils.HasAny(_type, "real"):
-		return internal.Type{Name: "float32", Pack: Empty} // 单精度
+		return internal.Type{Name: "float32"} // 单精度
 	case utils.HasAny(_type, "double"):
-		return internal.Type{Name: "float64", Pack: Empty} // 双精度
+		return internal.Type{Name: "float64"} // 双精度
 	case utils.HasAny(_type, "numeric", "decimal", "money"):
 		return internal.Type{Name: "decimal.Decimal", Pack: "github.com/shopspring/decimal"}
 		// 字符串：
 	case utils.HasAny(_type, "uuid", "text", "character", "cidr", "inet", "macaddr", "interval"):
-		return internal.Type{Name: "string", Pack: Empty}
+		return internal.Type{Name: "string"}
 		// 时间：
 	case utils.HasAny(_type, "time with", "date"):
 		return internal.Type{Name: "time.Time", Pack: "time"}
 	default:
-		return internal.Type{Name: "interface{}", Pack: Empty}
+		return internal.Type{Name: "interface{}"}
 	}
 }
-
-//
-// bitN  二进制
-// bytea
-//
-
-//
-// smallint
-// // int32
-// integer
-// //uint64
-// bigint

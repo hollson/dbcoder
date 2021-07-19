@@ -1,7 +1,8 @@
 package utils
 
 import (
-	// _ "github.com/lib/pq"
+	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -78,4 +79,27 @@ func HasAll(raw string, sub ...string) bool {
 		}
 	}
 	return true
+}
+
+// 判断tar是否与patterns中的任意规则所匹配
+func MatchAny(tar string, patterns ...string) bool {
+	if ContainString(tar, patterns...) {
+		return true
+	}
+
+	for _, p := range patterns {
+		switch {
+		case strings.HasPrefix(p, "*"):
+			p = fmt.Sprintf(".%s$", p) // *abc
+		case strings.HasSuffix(p, "*"):
+			p = fmt.Sprintf("^%s", strings.ReplaceAll(p, "*", ".*")) // abc*
+		default:
+			p = fmt.Sprintf("^%s$", strings.ReplaceAll(p, "*", ".*")) // ab*cd
+		}
+		// fmt.Printf("[%s]	", p)
+		if b, err := regexp.MatchString(p, tar); err == nil && b {
+			return true
+		}
+	}
+	return false
 }

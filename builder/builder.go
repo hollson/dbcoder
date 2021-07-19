@@ -33,13 +33,13 @@ func schemaFactory(driver internal.DatabaseDriver, c *internal.Config) internal.
 	// case core.Oracle:
 	// 	return new(mysql.Generator)
 	default:
-		return pgsql.New(c.Host, c.Port, c.User, c.Auth, c.DbName)
+		return pgsql.New(c.Host, c.Port, c.User, c.Auth, c.DbName, c.Ignores)
 	}
 }
 
 // 执行生成命令
-func Generate(driver internal.DatabaseDriver, cfg *internal.Config) error {
-	schema := schemaFactory(driver, cfg)
+func Generate(driver internal.DatabaseDriver, c *internal.Config) error {
+	schema := schemaFactory(driver, c)
 	tables, err := schema.Tables()
 	if err != nil {
 		return err
@@ -48,18 +48,18 @@ func Generate(driver internal.DatabaseDriver, cfg *internal.Config) error {
 		return errors.New("the count of tables in the database is 0")
 	}
 
-	if err := os.MkdirAll(cfg.Out, os.ModePerm); err != nil {
+	if err := os.MkdirAll(c.Out, os.ModePerm); err != nil {
 		return err
 	}
 
 	// 单文件输出
-	if cfg.Pile {
-		gofile := utils.PathTrim(fmt.Sprintf("%s/%s.go", cfg.Out, cfg.DbName))
+	if c.Pile {
+		gofile := utils.PathTrim(fmt.Sprintf("%s/%s.go", c.Out, c.DbName))
 		f, err := os.Create(gofile)
 		if err != nil {
 			return err
 		}
-		data := Schema2Template(driver, cfg, schema, tables...)
+		data := Schema2Template(driver, c, schema, tables...)
 		if err := Execute(f, data); err != nil {
 			return err
 		}
@@ -69,13 +69,13 @@ func Generate(driver internal.DatabaseDriver, cfg *internal.Config) error {
 
 	// 多文件输出
 	for _, table := range tables {
-		gofile := utils.PathTrim(fmt.Sprintf("%s/%s.go", cfg.Out, table.Name))
+		gofile := utils.PathTrim(fmt.Sprintf("%s/%s.go", c.Out, table.Name))
 		f, err := os.Create(gofile)
 		if err != nil {
 			return err
 		}
 
-		data := Schema2Template(driver, cfg, schema, table)
+		data := Schema2Template(driver, c, schema, table)
 		if err := Execute(f, data); err != nil {
 			return err
 		}
@@ -84,16 +84,16 @@ func Generate(driver internal.DatabaseDriver, cfg *internal.Config) error {
 	return nil
 }
 
-func Schema2Template(driver internal.DatabaseDriver, cfg *internal.Config, schema internal.Schema, tables ...internal.Table) *GenTemplate {
+func Schema2Template(driver internal.DatabaseDriver, c *internal.Config, schema internal.Schema, tables ...internal.Table) *GenTemplate {
 	t := &GenTemplate{
-		Generator: cfg.AppName,
-		Version:   cfg.Version,
-		Source:    fmt.Sprintf("%s://%s:%d/%s", driver, cfg.Host, cfg.Port, cfg.DbName),
+		Generator: c.AppName,
+		Version:   c.Version,
+		Source:    fmt.Sprintf("%s://%s:%d/%s", driver, c.Host, c.Port, c.DbName),
 		Date:      time.Now().Format("2006-01-02"),
-		Package:   cfg.Package,
+		Package:   c.Package,
 	}
 	if len(tables) == 1 {
-		t.Source = fmt.Sprintf("%s://%s:%d/%s/%s", driver, cfg.Host, cfg.Port, cfg.DbName, tables[0].Name)
+		t.Source = fmt.Sprintf("%s://%s:%d/%s/%s", driver, c.Host, c.Port, c.DbName, tables[0].Name)
 	}
 
 	for _, table := range tables {
@@ -104,7 +104,7 @@ func Schema2Template(driver internal.DatabaseDriver, cfg *internal.Config, schem
 		for _, column := range table.Columns {
 			obj.Fields = append(obj.Fields, Field{
 				Name:    utils.Pascal(column.Name),
-				Type:    schema.TypeMapping(column.Type).Name, // fixme 转换
+				Type:    schema.TypeMapping(column.Type).Name,
 				Tag:     column.Default,
 				Comment: column.Comment,
 			})

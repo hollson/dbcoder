@@ -1,8 +1,8 @@
 -- 创建表
-DROP TABLE IF EXISTS public.test_table;
+DROP TABLE IF EXISTS public.dbcoder_table;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE public.test_table
+CREATE TABLE public.dbcoder_table
 (
     id                    serial NOT NULL PRIMARY KEY,                      -- 主键(自动创建tableName_pkey自增序列)
     t_smallserial         smallserial,
@@ -45,33 +45,33 @@ CREATE TABLE public.test_table
 );
 
 -- 添加注释
-COMMENT ON TABLE public.test_table IS '我是一个类型演示表';
-COMMENT ON COLUMN public.test_table.id IS '主键';
-COMMENT ON COLUMN public.test_table.t_bit IS 'bit(1),即由0和1构成是字符串';
-COMMENT ON COLUMN public.test_table.t_bit_n IS 'bit(n)';
-COMMENT ON COLUMN public.test_table.t_real IS '单精度';
-COMMENT ON COLUMN public.test_table.t_double IS '双精度';
-COMMENT ON COLUMN public.test_table.t_numeric IS '同decimal';
-COMMENT ON COLUMN public.test_table.t_money IS '同decimal';
-COMMENT ON COLUMN public.test_table.t_inet IS 'ipv4/6';
-COMMENT ON COLUMN public.test_table.t_cidr IS 'ipv4/6,不接受子网掩码';
-COMMENT ON COLUMN public.test_table.t_macaddr IS 'MAC地址';
-COMMENT ON COLUMN public.test_table.t_interval IS '时间间隔,year|month|day|hour|min|second';
-COMMENT ON COLUMN public.test_table.t_bytea IS '字节数组';
+COMMENT ON TABLE public.dbcoder_table IS '我是一个类型演示表';
+COMMENT ON COLUMN public.dbcoder_table.id IS '主键';
+COMMENT ON COLUMN public.dbcoder_table.t_bit IS 'bit(1),即由0和1构成是字符串';
+COMMENT ON COLUMN public.dbcoder_table.t_bit_n IS 'bit(n)';
+COMMENT ON COLUMN public.dbcoder_table.t_real IS '单精度';
+COMMENT ON COLUMN public.dbcoder_table.t_double IS '双精度';
+COMMENT ON COLUMN public.dbcoder_table.t_numeric IS '同decimal';
+COMMENT ON COLUMN public.dbcoder_table.t_money IS '同decimal';
+COMMENT ON COLUMN public.dbcoder_table.t_inet IS 'ipv4/6';
+COMMENT ON COLUMN public.dbcoder_table.t_cidr IS 'ipv4/6,不接受子网掩码';
+COMMENT ON COLUMN public.dbcoder_table.t_macaddr IS 'MAC地址';
+COMMENT ON COLUMN public.dbcoder_table.t_interval IS '时间间隔,year|month|day|hour|min|second';
+COMMENT ON COLUMN public.dbcoder_table.t_bytea IS '字节数组';
 
 -- 插入数据
-INSERT INTO public.test_table(id)
+INSERT INTO public.dbcoder_table(id)
 VALUES (1);
 
 -- 创建索引
-CREATE INDEX idx_test ON public.test_table USING btree (t_bigint);
-COMMENT ON INDEX public.idx_test IS '一个索引测试';
+CREATE INDEX idx_dbcoder ON public.dbcoder_table USING btree (t_bigint);
+COMMENT ON INDEX public.idx_dbcoder IS '一个索引测试';
 
 --------------------------------------------------------------------------------------------------------
 
 -- 数组类型
-DROP TABLE IF EXISTS public.test_array;
-CREATE TABLE public.test_array
+DROP TABLE IF EXISTS public.dbcoder_array;
+CREATE TABLE public.dbcoder_array
 (
     id                      serial NOT NULL PRIMARY KEY,
     arr_boolean             boolean[]                     DEFAULT ARRAY [true, false],
@@ -97,10 +97,10 @@ CREATE TABLE public.test_array
     arr_time_nz             time WITHOUT time zone[]      DEFAULT ARRAY [CURRENT_TIMESTAMP],
     arr_date                date[]                        DEFAULT ARRAY [CURRENT_DATE,now()]
 );
-COMMENT ON TABLE public.test_array IS '演示数组类型';
-COMMENT ON COLUMN public.test_array.arr_bytea IS '二维数组，即[][]byte';
+COMMENT ON TABLE public.dbcoder_array IS '演示数组类型';
+COMMENT ON COLUMN public.dbcoder_array.arr_bytea IS '二维数组，即[][]byte';
 
-INSERT INTO public.test_array(id)
+INSERT INTO public.dbcoder_array(id)
 VALUES (1);
 
 --------------------------------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ FROM pg_attribute a
 WHERE a.attisdropped = FALSE
   AND a.attnum > 0
   AND n.nspname = 'public'
-  AND C.relname = 'test_table' -- 表名
+  AND C.relname = 'dbcoder_table' -- 表名
 ORDER BY a.attnum;
 
 

@@ -41,3 +41,14 @@ func TestHasSub(t *testing.T) {
 	fmt.Println(HasAny("time", "timestamp"))            // false
 	fmt.Println(HasAny("hello world !", "hello world")) // true
 }
+
+func TestMatchAny(t *testing.T) {
+	fmt.Println(MatchAny("golang", "go*", "golang"))        // true
+	fmt.Println(MatchAny("golang", "go*", "hello world"))   // true
+	fmt.Println(MatchAny("golang", "*lang", "hello world")) // true
+	fmt.Println(MatchAny("golang", "*lan", "hello world"))  // false
+	fmt.Println(MatchAny("golang", "go*ng", "hello world")) // true
+	fmt.Println(MatchAny("lang", "go*ng", "hello world"))   // false
+	fmt.Println(MatchAny("wo", "go*ng", "hello world"))     // false
+	fmt.Println(MatchAny("hello world", "hello *rld"))      // true
+}
