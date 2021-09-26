@@ -3,15 +3,17 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// https://github.com/xxjwxc/gormt
 type MySql struct {
 	DB     *sql.DB
 	DBName string
 }
 
-//连接pgsql数据库
+// 连接pgsql数据库
 func (this *MySql) Init(userName, pwd, host string, port int, dbName string) error {
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%v)/%s", userName, pwd, host, port, dbName)
 	_db, err := sql.Open("mysql", dataSourceName)

@@ -20,12 +20,12 @@ const (
 
 // driver name
 func (d DatabaseDriver) String() string {
-	return []string{"MySQL", "PostgreSQL", "SQLite", "MongoDB", "MariaDB", "Oracle", "SQLServer"}[d-1]
+	return []string{"Unknown","MySQL", "PostgreSQL", "SQLite", "MongoDB", "MariaDB", "Oracle", "SQLServer"}[d]
 }
 
 // driver short name
 func (d DatabaseDriver) Name() string {
-	return []string{"mysql", "pgsql", "sqlite", "mongo", "maria", "oracle", "mssql"}[d-1]
+	return []string{"unknown","mysql", "pgsql", "sqlite", "mongo", "maria", "oracle", "mssql"}[d]
 }
 
 // get driver value by driver short name
