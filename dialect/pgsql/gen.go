@@ -13,8 +13,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const Empty = ""
-
 // PostgreSQL数据库代码生成器
 type Generator struct {
 	Source  string   // 连接字符串

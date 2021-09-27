@@ -15,6 +15,11 @@ import (
 	"github.com/hollson/dbcoder/utils"
 )
 
+const (
+	AppName = "dbcoder"
+	VERSION = "v1.0.0"
+)
+
 // dbcoder -d pgsql -h localhost -p 5432 -u postgres -auth 123456 -d deeplink -gorm
 
 // 生成器工厂

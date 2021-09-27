@@ -8,7 +8,7 @@ import (
 
 const BLANK = ""
 
-// 目标元素tar是否包含在container集合中
+// ContainString 目标元素tar是否包含在container集合中
 func ContainString(tar string, container ...string) bool {
 	for _, v := range container {
 		if tar == v {
@@ -18,7 +18,7 @@ func ContainString(tar string, container ...string) bool {
 	return false
 }
 
-// 转换为帕斯卡命名
+//  转换为帕斯卡命名
 //  如: userName => UserName
 //     user_name => UserName
 func Pascal(title string) string {

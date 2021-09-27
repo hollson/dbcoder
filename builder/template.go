@@ -26,7 +26,17 @@ package {{.Package}} {{ifImports .Imports}}
 {{range .Structs}}{{ifComment .Comment}}
 type {{.Name}} struct {
 	{{range .Fields}}{{.Name}} {{.Type}}  $BACKQUOTE{{.Tag}}$BACKQUOTE {{if ne .Comment ""}} //{{.Comment}}{{end}}
-{{end}}}{{end}}`
+{{end}}}
+{{end}}
+`
+
+var GormTemplete = `func BeforunUpdaet()  {
+
+}
+
+func AfterUpdaet()  {
+
+}`
 
 type GenTemplate struct {
 	Generator string   // 生成器名称

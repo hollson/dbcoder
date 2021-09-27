@@ -2,6 +2,8 @@
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
 
+// 从命令行或环境变量读取配置信息
+
 package builder
 
 import (
@@ -47,10 +49,9 @@ func initFlag() {
 	utils.BoolVar(&_version, "version", false, "查看版本")
 	utils.BoolVar(&_pile, "pile", false, "单文件输出")
 	utils.BoolVar(&_help, "help", false, "查看帮助")
-
 }
 
-// 加载命令行参数
+// 加载命令行参数Load
 func Load() (internal.DatabaseDriver, *internal.Config) {
 	defer func() {
 		if err := recover(); err != nil {

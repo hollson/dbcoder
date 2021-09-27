@@ -43,7 +43,7 @@ push:commit
 ## test@执行测试。
 .PHONY:test
 test: build
-	@./bin/dbcoder -driver=pgsql -host=localhost -port=5432 -user=postgres -auth=123456 -dbname=deeplink -gorm=true -ignores=test*,log
+	@./bin/dbcoder -driver=pgsql -host=localhost -port=5432 -user=postgres -auth=123456 -pile -dbname=deeplink -gorm=true -ignores=test*,log
 
 
 ## help@查看make帮助。
