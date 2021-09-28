@@ -13,7 +13,7 @@ import (
 
 	"github.com/hollson/dbcoder/dialect/gorm"
 	"github.com/hollson/dbcoder/internal"
-	"github.com/hollson/dbcoder/internal/schema"
+	"github.com/hollson/dbcoder/schema"
 	"github.com/hollson/dbcoder/utils"
 )
 

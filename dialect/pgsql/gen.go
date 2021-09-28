@@ -8,7 +8,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/hollson/dbcoder/internal/schema"
+	"github.com/hollson/dbcoder/schema"
 	"github.com/hollson/dbcoder/utils"
 	_ "github.com/lib/pq"
 )

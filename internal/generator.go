@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/hollson/dbcoder/dialect/pgsql"
-	"github.com/hollson/dbcoder/internal/schema"
+	schema2 "github.com/hollson/dbcoder/schema"
 	"github.com/hollson/dbcoder/utils"
 )
 
@@ -17,15 +17,15 @@ const (
 )
 
 type Generator struct {
-	schema.Driver // 数据库驱动类型
-	Profile       // 配置文件
+	schema2.Driver // 数据库驱动类型
+	Profile        // 配置文件
 }
 
 // Determine whether the driver is supported
 func (g *Generator) Supported() bool {
-	ds := []schema.Driver{
-		schema.MySQL,
-		schema.PostgreSQL,
+	ds := []schema2.Driver{
+		schema2.MySQL,
+		schema2.PostgreSQL,
 		// SQLite,
 		// MongoDB,
 		// MariaDB,
@@ -89,7 +89,7 @@ func (g *Generator) Generate() error {
 }
 
 // 生成器工厂 gen
-func (g *Generator) factory() schema.Schema {
+func (g *Generator) factory() schema2.Schema {
 	switch g.Driver {
 	// case core.MySQL:
 	// 	return mysql.New(cfg)
@@ -108,7 +108,7 @@ func (g *Generator) factory() schema.Schema {
 	}
 }
 
-func (g *Generator) template(schema schema.Schema, tables ...schema.Table) *GenTemplate {
+func (g *Generator) template(schema schema2.Schema, tables ...schema2.Table) *GenTemplate {
 	t := &GenTemplate{
 		Generator: g.AppName,
 		Version:   g.Version,

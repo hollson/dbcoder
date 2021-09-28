@@ -2,12 +2,9 @@
 // Use of this source code is governed by a MIT style
 // license that can be found in the LICENSE file.
 
-/*
- Schema定义了代码生成器所依赖的数据库信息
-*/
 package schema
 
-// 数据库信息
+// 定义了代码生成器所依赖的数据库信息
 type Schema interface {
 	Tables() ([]Table, error)
 	TypeMapping(string) Type
