@@ -4,7 +4,7 @@
 
 // 从命令行或环境变量读取配置信息
 
-package builder
+package main
 
 import (
 	"fmt"
@@ -13,6 +13,7 @@ import (
 
 	"github.com/hollson/dbcoder/dialect/gorm"
 	"github.com/hollson/dbcoder/internal"
+	"github.com/hollson/dbcoder/internal/schema"
 	"github.com/hollson/dbcoder/utils"
 )
 
@@ -51,19 +52,19 @@ func initFlag() {
 	utils.BoolVar(&_help, "help", false, "查看帮助")
 }
 
-// 加载命令行参数Load
-func Load() (internal.DatabaseDriver, *internal.Config) {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Printf("\033[%dmAn error occurred: %v\033[0m\n\n", utils.FgRed, err)
-			Usage()
-			os.Exit(1)
-		}
-	}()
+// 加载命令行参数
+func Load() (*internal.Generator, error) {
+	// defer func() {
+	// 	if err := recover(); err != nil {
+	// 		fmt.Printf("\033[%dmAn error occurred: %v\033[0m\n\n", utils.FgRed, err)
+	// 		Usage()
+	// 		os.Exit(1)
+	// 	}
+	// }()
 
 	initFlag()
 	if err := utils.Parse(); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if _help || len(os.Args) == 1 {
@@ -72,27 +73,34 @@ func Load() (internal.DatabaseDriver, *internal.Config) {
 	}
 
 	if _version {
-		fmt.Println(VERSION)
+		fmt.Println(internal.VERSION)
 		os.Exit(0)
 	}
 
 	if err := check(); err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return internal.DriverValue(_driver), &internal.Config{
-		AppName: AppName,
-		Version: VERSION,
-		Host:    _host,
-		Port:    _port,
-		User:    _user,
-		Auth:    _auth,
-		DbName:  _dbName,
-		Package: _package,
-		Ignores: strings.Split(_ignores, ","),
-		Out:     _out,
-		Pile:    _pile,
+	gen := &internal.Generator{
+		Driver: schema.DriverValue(_driver),
+		Profile: internal.Profile{
+			AppName: internal.AppName,
+			Version: internal.VERSION,
+			Host:    _host,
+			Port:    _port,
+			User:    _user,
+			Auth:    _auth,
+			DbName:  _dbName,
+			Package: _package,
+			Ignores: strings.Split(_ignores, ","),
+			Out:     _out,
+			Pile:    _pile,
+		},
 	}
+	if !gen.Supported() {
+		return nil, fmt.Errorf("the driver named %v is not supported", _driver)
+	}
+	return gen, nil
 }
 
 // 检查命令行参数
@@ -101,20 +109,15 @@ func check() error {
 		return fmt.Errorf("driver is needed")
 	}
 
-	if !internal.Supported(_driver) {
-		return fmt.Errorf("the driver named %v is not supported", _driver)
-	}
-
 	if len(_dbName) == 0 {
 		return fmt.Errorf("dbname is needed")
 	}
 	return nil
 }
 
-// 打印帮助信息
 func Usage() {
 	fmt.Println("\033[1;34m Welcome to dbcoder\033[0m")
-	fmt.Printf("\u001B[1;35m       ____                   __         \n  ____/ / /_  _________  ____/ ___  _____\n / __  / __ \\/ ___/ __ \\/ __  / _ \\/ ___/\n/ /_/ / /_/ / /__/ /_/ / /_/ /  __/ /    \n\\__,_/_.___/\\___/\\____/\\__,_/\\___/_/     (%v)\u001B[0m\n", VERSION)
+	fmt.Printf("\u001B[1;35m       ____                   __         \n  ____/ / /_  _________  ____/ ___  _____\n / __  / __ \\/ ___/ __ \\/ __  / _ \\/ ___/\n/ /_/ / /_/ / /__/ /_/ / /_/ /  __/ /    \n\\__,_/_.___/\\___/\\____/\\__,_/\\___/_/     (%v)\u001B[0m\n", internal.VERSION)
 	fmt.Printf(`
 Usage:
     dbcoder <command> dbname=<dbName> [option]...

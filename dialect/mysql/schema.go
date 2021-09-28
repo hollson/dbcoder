@@ -16,7 +16,7 @@ type Generator struct {
 	DbName string
 }
 
-func New(config *internal.Config) *Generator {
+func New(config *internal.Profile) *Generator {
 	gen := &Generator{
 		Host:   "",
 		Port:   0,
@@ -26,7 +26,6 @@ func New(config *internal.Config) *Generator {
 	}
 	return gen
 }
-
 
 func (g *Generator) Gen() error {
 

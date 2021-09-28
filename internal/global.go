@@ -8,8 +8,8 @@ import (
 	"fmt"
 )
 
-// 代码生成器配置项
-type Config struct {
+// 代码生成器概要信息
+type Profile struct {
 	AppName string   // 应用名称
 	Version string   // 应用版本
 	Host    string   // 主机
@@ -24,6 +24,6 @@ type Config struct {
 	Pile    bool     // 单文件输出
 }
 
-func (c *Config) String() string {
+func (c *Profile) String() string {
 	return fmt.Sprintf("%+v", *c)
 }

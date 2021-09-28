@@ -5,7 +5,7 @@
 /*
  Schema定义了代码生成器所依赖的数据库信息
 */
-package internal
+package schema
 
 // 数据库信息
 type Schema interface {

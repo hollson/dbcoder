@@ -5,7 +5,7 @@
 /*
 使用template模板方式，将Struct对象转换为go文件
 */
-package builder
+package internal
 
 import (
 	"fmt"
