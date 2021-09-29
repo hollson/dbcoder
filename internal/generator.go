@@ -33,7 +33,6 @@ func (g *Generator) Supported() bool {
 		// SQLServer,
 	}
 	for _, v := range ds {
-		//		fmt.Println("=======================> ", v, g.Driver)
 		if v == g.Driver {
 			return true
 		}

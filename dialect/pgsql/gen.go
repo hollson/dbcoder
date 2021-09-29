@@ -73,7 +73,7 @@ func (g *Gen) Tables() (ret []schema.Table, err error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf(" 💻 连接数据库: %s\n", g.Source)
+	fmt.Printf(" 🛢 连接数据库: %s\n", g.Source)
 	defer _db.Close()
 
 	rows, err := _db.Query(g.tablesSQL())
