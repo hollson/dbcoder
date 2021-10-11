@@ -52,7 +52,7 @@ func initFlag() {
 	utils.BoolVar(&_help, "help", false, "查看帮助")
 }
 
-// 加载命令行参数
+// Load 加载命令行参数
 func Load() (*internal.Generator, error) {
 	// defer func() {
 	// 	if err := recover(); err != nil {
@@ -115,6 +115,7 @@ func check() error {
 	return nil
 }
 
+// Usage 使用帮助
 func Usage() {
 	fmt.Println("\033[1;34m Welcome to dbcoder\033[0m")
 	fmt.Printf("\u001B[1;35m       ____                   __         \n  ____/ / /_  _________  ____/ ___  _____\n / __  / __ \\/ ___/ __ \\/ __  / _ \\/ ___/\n/ /_/ / /_/ / /__/ /_/ / /_/ /  __/ /    \n\\__,_/_.___/\\___/\\____/\\__,_/\\___/_/     (%v)\u001B[0m\n", internal.VERSION)
@@ -143,7 +144,7 @@ Example:
     dbcoder -driver=pgsql -dbname=testdb
     dbcoder -driver=pgsql -host=localhost -port=5432 -user=postgres -auth=postgres -dbname=testdb -gorm -package=entity
 
-更多详情，请参考 https://github.com/hollson/dbcoder
+More can refer to https://github.com/hollson/dbcoder
 
 `)
 }

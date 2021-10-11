@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/hollson/dbcoder/dialect/pgsql"
-	schema2 "github.com/hollson/dbcoder/schema"
+	"github.com/hollson/dbcoder/schema"
 	"github.com/hollson/dbcoder/utils"
 )
 
@@ -17,15 +17,15 @@ const (
 )
 
 type Generator struct {
-	schema2.Driver // 数据库驱动类型
-	Profile        // 配置文件
+	schema.Driver // 数据库驱动类型
+	Profile       // 配置文件
 }
 
 // Determine whether the driver is supported
 func (g *Generator) Supported() bool {
-	ds := []schema2.Driver{
-		schema2.MySQL,
-		schema2.PostgreSQL,
+	ds := []schema.Driver{
+		schema.MySQL,
+		schema.PostgreSQL,
 		// SQLite,
 		// MongoDB,
 		// MariaDB,
@@ -42,8 +42,8 @@ func (g *Generator) Supported() bool {
 
 // 执行生成命令
 func (g *Generator) Generate() error {
-	schema := g.factory()
-	tables, err := schema.Tables()
+	_schema := g.factory()
+	tables, err := _schema.Tables()
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (g *Generator) Generate() error {
 		if err != nil {
 			return err
 		}
-		data := g.template(schema, tables...)
+		data := g.template(_schema, tables...)
 		if err := Execute(f, data); err != nil {
 			return err
 		}
@@ -78,7 +78,7 @@ func (g *Generator) Generate() error {
 			return err
 		}
 
-		data := g.template(schema, table)
+		data := g.template(_schema, table)
 		if err := Execute(f, data); err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ func (g *Generator) Generate() error {
 }
 
 // 生成器工厂 gen
-func (g *Generator) factory() schema2.Schema {
+func (g *Generator) factory() schema.Schema {
 	switch g.Driver {
 	// case core.MySQL:
 	// 	return mysql.New(cfg)
@@ -107,7 +107,7 @@ func (g *Generator) factory() schema2.Schema {
 	}
 }
 
-func (g *Generator) template(schema schema2.Schema, tables ...schema2.Table) *GenTemplate {
+func (g *Generator) template(schema schema.Schema, tables ...schema.Table) *GenTemplate {
 	t := &GenTemplate{
 		Generator: g.AppName,
 		Version:   g.Version,
