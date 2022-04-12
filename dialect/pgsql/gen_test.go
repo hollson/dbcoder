@@ -16,6 +16,6 @@ func TestContain(t *testing.T)  {
 	bigstr := bigint.String()
 	fmt.Println(bigstr)
 
-	// fmt.Println(strings.Count("date,time", "time"))
+	// fmt.Println(strings.Pages("date,time", "time"))
 	// fmt.Println(strings.IndexAny("hi,中国", "国"))
 }

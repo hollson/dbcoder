@@ -18,7 +18,7 @@ func ContainString(tar string, container ...string) bool {
 	return false
 }
 
-//  转换为帕斯卡命名
+// 转换为帕斯卡命名
 //  如: userName => UserName
 //     user_name => UserName
 func Pascal(title string) string {
